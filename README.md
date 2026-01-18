@@ -2,7 +2,7 @@
 
 > A specialized e-commerce platform for men's clothing in Kazakhstan, built with Go and PostgreSQL.
 
-## 👥 The Team
+## The Team
 * **Member 1 (Lead/Auth):** [Adil] - Database, Auth, User Management
 * **Member 2 (Frontend/Store):** [Nurassyl] - Products, UI/UX, Catalog
 * **Member 3 (Orders/Docs):** [Yerassyl] - Shopping Cart, Checkout, Admin Panel
@@ -22,7 +22,7 @@ Ensure you have the following installed:
 ### 2. Database Setup (Crucial!)
 You cannot run the app without the database.
 1. Open **pgAdmin 4**.
-2. Create a new database named **`clothing_store`** (or `clothes_store` if you used that name).
+2. Create a new database named **`clothes_store`**.
 3. Right-click the database -> **Query Tool**.
 4. Open the file `schema.sql` from this repository, copy the content, and run it in pgAdmin.
 5. (Optional) Create a dedicated user:
