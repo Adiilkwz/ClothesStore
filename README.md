@@ -29,3 +29,4 @@ You cannot run the app without the database.
    ```sql
    CREATE USER store_admin WITH PASSWORD '12345';
    ALTER DATABASE clothing_store OWNER TO store_admin;
+   
