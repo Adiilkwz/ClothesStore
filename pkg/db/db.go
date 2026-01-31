@@ -20,6 +20,6 @@ func InitDB(dataSourceName string) *sql.DB {
 		log.Fatal("Error connecting to the database (Ping failed): ", err)
 	}
 
-	fmt.Println("✅ Successfully connected to PostgreSQL!")
+	fmt.Println("Successfully connected to PostgreSQL!")
 	return db
 }
