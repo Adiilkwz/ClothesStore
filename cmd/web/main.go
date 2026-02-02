@@ -10,6 +10,7 @@ import (
 	"clothes-store/internal/models"
 	"clothes-store/pkg/db"
 
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -49,24 +50,24 @@ func main() {
 	handlers.StartEmailWorker()
 
 	// Define Routes
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 
 	// Auth Routes
-	mux.HandleFunc("/signup", authHandler.SignUp)
-	mux.HandleFunc("/login", authHandler.Login)
+	r.HandleFunc("/signup", authHandler.SignUp).Methods("POST")
+	r.HandleFunc("/login", authHandler.Login).Methods("POST")
 
 	// Order Routes
-	mux.HandleFunc("/orders", orderHandler.CreateOrder)
+	r.HandleFunc("/orders", orderHandler.CreateOrder).Methods("POST")
 
 	// Store Routes
-	mux.HandleFunc("/products", storeHandler.GetAll)
-	mux.HandleFunc("/products/create", storeHandler.Create)
+	r.HandleFunc("/products", storeHandler.GetAll).Methods("GET")
+	r.HandleFunc("/products/create", storeHandler.Create).Methods("POST")
 
 	// Start Server
 	port := os.Getenv("PORT")
 
 	log.Printf("Server starting on :%s...", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
+	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
 }
