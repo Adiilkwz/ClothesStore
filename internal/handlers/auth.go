@@ -63,3 +63,29 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
+func (h *AuthHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
+	userID := 1
+	user, err := h.UserModel.GetByID(userID)
+	if err != nil {
+		http.Error(w, "User not found", 404)
+		return
+	}
+	w.Header().Set("Content-type", "application/json")
+	json.NewEncoder(w).Encode(user)
+}
+
+func (h *AuthHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	userId := 1
+	var input struct {
+		Name    string `json:"name"`
+		Address string `json:"address"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Invalid JSON", 400)
+		return
+	}
+	h.UserModel.Update(userId, input.Name, input.Address)
+	w.Write([]byte("Profile updated"))
+}
