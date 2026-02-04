@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"clothes-store/internal/models"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
+
+	"clothes-store/internal/models"
 
 	"github.com/gorilla/mux"
 )
@@ -76,9 +77,21 @@ func (sh *StoreHandler) Update(w http.ResponseWriter, r *http.Request) {
 		Price int `json:"price_kzt"`
 		Stock int `json:"stock_quantity"`
 	}
-	json.NewDecoder(r.Body).Decode(&input)
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
 
-	sh.ProductModel.Update(id, input.Price, input.Stock)
+	if input.Price <= 0 {
+		http.Error(w, "Price must be positive", http.StatusBadRequest)
+		return
+	}
+
+	err := sh.ProductModel.Update(id, input.Price, input.Stock)
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
 	w.Write([]byte("Product updated"))
 }
 

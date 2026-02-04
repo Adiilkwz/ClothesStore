@@ -1,16 +1,16 @@
 package handlers
 
 import (
-	"clothes-store/internal/models"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"clothes-store/internal/models"
 
 	"github.com/gorilla/mux"
 )
 
 type OrderRequest struct {
-	UserID     int                     `json:"user_id"`
 	ProductIDs []models.OrderItemInput `json:"items"`
 }
 
@@ -19,6 +19,14 @@ type OrderHandler struct {
 }
 
 func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
+	userIDVal := r.Context().Value("userID")
+
+	userID, ok := userIDVal.(int)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	var req OrderRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -26,7 +34,7 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orderID, err := h.OrderModel.Create(req.UserID, req.ProductIDs)
+	orderID, err := h.OrderModel.Create(userID, req.ProductIDs)
 	if err != nil {
 		http.Error(w, "Failed to create order: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -43,7 +51,12 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrderHandler) GetMyOrders(w http.ResponseWriter, r *http.Request) {
-	userID := 1
+	userIDVal := r.Context().Value("userID")
+	userID, ok := userIDVal.(int)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	orders, err := h.OrderModel.GetAllByUserID(userID)
 	if err != nil {
