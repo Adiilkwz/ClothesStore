@@ -66,3 +66,22 @@ func (m *ProductModel) GetAll() ([]Product, error) {
 	}
 	return products, nil
 }
+
+func (m *ProductModel) Get(id int) (*Product, error) {
+	stmt := `SELECT id, name, description, price_kzt, size, category, image_url, stock_quantity FROM products WHERE id = $1`
+	p := &Product{}
+	err := m.DB.QueryRow(stmt, id).Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Size, &p.Category, &p.ImageURL, &p.StockQuantity)
+	return p, err
+}
+
+func (m *ProductModel) Update(id int, price, stock int) error {
+	stmt := `UPDATE products SET price_kzt = $1, stock_quantity = $2 WHERE id = $3`
+	_, err := m.DB.Exec(stmt, price, stock, id)
+	return err
+}
+
+func (m *ProductModel) Delete(id int) error {
+	stmt := `DELETE FROM products WHERE id = $1`
+	_, err := m.DB.Exec(stmt, id)
+	return err
+}

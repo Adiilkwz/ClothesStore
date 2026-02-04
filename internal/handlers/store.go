@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"clothes-store/internal/models"
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
-	"clothes-store/internal/models"
+	"github.com/gorilla/mux"
 )
 
 type StoreHandler struct {
@@ -51,4 +53,38 @@ func (sh *StoreHandler) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(product)
+}
+
+func (sh *StoreHandler) GetOne(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+
+	product, err := sh.ProductModel.Get(id)
+	if err != nil {
+		http.Error(w, "Product not found", 404)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(product)
+}
+
+func (sh *StoreHandler) Update(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+
+	var input struct {
+		Price int `json:"price_kzt"`
+		Stock int `json:"stock_quantity"`
+	}
+	json.NewDecoder(r.Body).Decode(&input)
+
+	sh.ProductModel.Update(id, input.Price, input.Stock)
+	w.Write([]byte("Product updated"))
+}
+
+func (sh *StoreHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	sh.ProductModel.Delete(id)
+	w.Write([]byte("Product deleted"))
 }
