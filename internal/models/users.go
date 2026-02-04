@@ -73,3 +73,16 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 
 	return id, nil
 }
+
+func (m *UserModel) GetByID(id int) (*User, error) {
+	stmt := `SELECT id, name, email, address, created_at, FROM users WHERE id = $1`
+	u := &User{}
+	err := m.DB.QueryRow(stmt, id).Scan(&u.ID, &u.Name, &u.Email, &u.Address, &u.Created)
+	return u, err
+}
+
+func (m *UserModel) Update(id int, name, address string) error {
+	stmt := `UPDATE users SET name = $1, address = $2 WHERE id = $3`
+	_, err := m.DB.Exec(stmt, name, address, id)
+	return err
+}
