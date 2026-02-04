@@ -34,7 +34,7 @@ func RequireAuth(next http.Handler) http.Handler {
 			userId := int(claims["user_id"].(float64))
 			role := claims["role"].(string)
 
-			ctx := context.WithValue(r.Context(), "userId", userId)
+			ctx := context.WithValue(r.Context(), "userID", userId)
 			ctx = context.WithValue(ctx, "role", role)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
