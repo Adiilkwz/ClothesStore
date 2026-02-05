@@ -43,3 +43,22 @@ func RequireAuth(next http.Handler) http.Handler {
 		}
 	})
 }
+
+func RequireAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		roleVal := r.Context().Value("role")
+
+		if roleVal == "" {
+			http.Error(w, "Unatuhorized", http.StatusUnauthorized)
+			return
+		}
+
+		role, ok := roleVal.(string)
+		if !ok || role != "admin" {
+			http.Error(w, "Forbidden: Access denied", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

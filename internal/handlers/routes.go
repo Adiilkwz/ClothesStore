@@ -24,7 +24,10 @@ func RegisterRoutes(r *mux.Router, auth *AuthHandler, store *StoreHandler, order
 	api.HandleFunc("/orders/{id}", order.GetOrderDetails).Methods("GET")
 	api.HandleFunc("/orders/{id}/cancel", order.CancelOrder).Methods("PUT")
 
-	api.HandleFunc("/products", store.Create).Methods("POST")
-	api.HandleFunc("/products/{id}", store.Update).Methods("PUT")
-	api.HandleFunc("/products/{id}", store.Delete).Methods("DELETE")
+	admin := api.PathPrefix("/admin").Subrouter()
+	admin.Use(middleware.RequireAdmin)
+
+	admin.HandleFunc("/products", store.Create).Methods("POST")
+	admin.HandleFunc("/products/{id}", store.Update).Methods("PUT")
+	admin.HandleFunc("/products/{id}", store.Delete).Methods("DELETE")
 }
