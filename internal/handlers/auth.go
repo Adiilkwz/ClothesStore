@@ -53,13 +53,13 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := h.UserModel.Authenticate(input.Email, input.Password)
+	id, role, err := h.UserModel.Authenticate(input.Email, input.Password)
 	if err != nil {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
-	token, err := createToken(id, "user")
+	token, err := createToken(id, role)
 	if err != nil {
 		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
 		return
