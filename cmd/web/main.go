@@ -1,40 +1,38 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
 	"log"
 	"net/http"
-	"os"
 
+	"clothes-store/internal/config"
 	"clothes-store/internal/handlers"
+	"clothes-store/internal/mailer"
 	"clothes-store/internal/models"
-	"clothes-store/pkg/db"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	// Load Environment Variables
-	err := godotenv.Load()
+	cfg := config.Load()
+
+	db, err := sql.Open("postgres", cfg.DBUrl)
 	if err != nil {
-		log.Println("Warning: .env file not found. Relying on system env vars.")
+		log.Fatal(err)
 	}
+	defer db.Close()
 
-	connStr := os.Getenv("DB_DSN")
-	if connStr == "" {
-		log.Fatal("DB_DSN environment variable is not set in .env")
+	// Database connection
+	if err := db.Ping(); err != nil {
+		log.Fatal("Cannot connect to database: ", err)
 	}
-
-	// Initialize Database
-	dbConn := db.InitDB(connStr)
-	defer dbConn.Close()
-	fmt.Println("Database connected succesfully")
+	log.Println("Database connected succesfully")
 
 	// Initialize Models
-	userModel := &models.UserModel{DB: dbConn}
-	orderModel := &models.OrderModel{DB: dbConn}
-	productModel := &models.ProductModel{DB: dbConn}
+	userModel := &models.UserModel{DB: db}
+	orderModel := &models.OrderModel{DB: db}
+	productModel := &models.ProductModel{DB: db}
 
 	// Initialize Handlers
 	authHandler := &handlers.AuthHandler{UserModel: userModel}
@@ -42,32 +40,21 @@ func main() {
 
 	storeHandler := &handlers.StoreHandler{
 		ProductModel: productModel,
-		Logger:       log.New(os.Stdout, "[STORE]", log.LstdFlags),
+		Logger:       log.Default(),
 	}
 
 	// Start Background Worker
 	log.Println("Starting background email worker...")
-	handlers.StartEmailWorker()
+	mailer.StartEmailWorker()
 
 	// Define Routes
 	r := mux.NewRouter()
 
-	// Auth Routes
-	r.HandleFunc("/signup", authHandler.SignUp).Methods("POST")
-	r.HandleFunc("/login", authHandler.Login).Methods("POST")
-
-	// Order Routes
-	r.HandleFunc("/orders", orderHandler.CreateOrder).Methods("POST")
-
-	// Store Routes
-	r.HandleFunc("/products", storeHandler.GetAll).Methods("GET")
-	r.HandleFunc("/products/create", storeHandler.Create).Methods("POST")
+	handlers.RegisterRoutes(r, authHandler, storeHandler, orderHandler)
 
 	// Start Server
-	port := os.Getenv("PORT")
-
-	log.Printf("Server starting on :%s...", port)
-	if err := http.ListenAndServe(":"+port, r); err != nil {
+	log.Printf("Server starting on :%s...", cfg.Port)
+	if err := http.ListenAndServe(":"+cfg.Port, r); err != nil {
 		log.Fatal(err)
 	}
 }
