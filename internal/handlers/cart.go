@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"clothes-store/internal/mailer"
 	"clothes-store/internal/models"
 
 	"github.com/gorilla/mux"
@@ -40,7 +41,7 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	EmailQueue <- "customer@example.com"
+	mailer.EmailQueue <- "customer@example.com"
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
