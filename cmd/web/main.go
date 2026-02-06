@@ -36,7 +36,10 @@ func main() {
 
 	// Initialize Handlers
 	authHandler := &handlers.AuthHandler{UserModel: userModel}
-	orderHandler := &handlers.OrderHandler{OrderModel: orderModel}
+	orderHandler := &handlers.OrderHandler{
+		OrderModel: orderModel,
+		UserModel:  userModel,
+	}
 
 	storeHandler := &handlers.StoreHandler{
 		ProductModel: productModel,
@@ -45,7 +48,7 @@ func main() {
 
 	// Start Background Worker
 	log.Println("Starting background email worker...")
-	mailer.StartEmailWorker()
+	mailer.StartEmailWorker(cfg)
 
 	// Define Routes
 	r := mux.NewRouter()

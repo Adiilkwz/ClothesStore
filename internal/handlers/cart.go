@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -17,6 +18,7 @@ type OrderRequest struct {
 
 type OrderHandler struct {
 	OrderModel *models.OrderModel
+	UserModel  *models.UserModel
 }
 
 func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
@@ -37,11 +39,16 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	orderID, err := h.OrderModel.Create(userID, req.ProductIDs)
 	if err != nil {
-		http.Error(w, "Failed to create order: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	mailer.EmailQueue <- "customer@example.com"
+	user, err := h.UserModel.GetByID(userID)
+	if err == nil {
+		mailer.EmailQueue <- user.Email
+	} else {
+		log.Printf("Could not fetch email for user %d", userID)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

@@ -8,9 +8,13 @@ import (
 )
 
 type Config struct {
-	Port      string
-	DBUrl     string
-	JWTSecret string
+	Port         string
+	DBUrl        string
+	JWTSecret    string
+	SMTPHost     string
+	SMTPPort     string
+	SMTPEmail    string
+	SMTPPassword string
 }
 
 func Load() *Config {
@@ -20,9 +24,13 @@ func Load() *Config {
 	}
 
 	cfg := &Config{
-		Port:      getEnv("PORT", ":5050"),
-		DBUrl:     getEnv("DB_DSN", ""),
-		JWTSecret: getEnv("JWT_SECRET", "default_secret_key_for_dev"),
+		Port:         getEnv("PORT", ":5050"),
+		DBUrl:        getEnv("DB_DSN", ""),
+		JWTSecret:    getEnv("JWT_SECRET", "default_secret_key_for_dev"),
+		SMTPHost:     getEnv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort:     getEnv("SMTP_PORT", "587"),
+		SMTPEmail:    getEnv("SMTP_EMAIL", ""),
+		SMTPPassword: getEnv("SMTP_PASSWORD", ""),
 	}
 
 	if cfg.DBUrl == "" {
