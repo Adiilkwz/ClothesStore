@@ -1,0 +1,25 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta-charset="UTF-8">
+    <title>{{template "title" .}} - Clothes Store</title>
+    
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    {{block "css" .}}{{end}}
+</head>
+<body>
+    <nav>
+        </nav>
+
+    <main>
+        {{template "main" .}}
+    </main>
+
+    <script src="/static/js/main.js"></script>
+
+    {{block "js" .}}{{end}}
+</body>
+</html>
+{{end}}
