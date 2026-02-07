@@ -1,0 +1,22 @@
+{{template "base" .}}
+{{define "main"}}
+  <h1>Admin Dashboard</h1>
+  
+  <form class="admin-form">
+      <input type="text" placeholder="Product Name">
+      <input type="number" placeholder="Price">
+      <button class="btn">Add Product</button>
+  </form>
+
+  <table class="admin-table">
+      <thead>
+          <tr><th>ID</th><th>Name</th><th>Price</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td>1</td><td>Test Shirt</td><td>5000 KZT</td>
+              <td><button>Delete</button></td>
+          </tr>
+      </tbody>
+  </table>
+{{end}}

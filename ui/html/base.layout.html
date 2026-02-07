@@ -2,23 +2,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta-charset="UTF-8">
-    <title>{{template "title" .}} - Clothes Store</title>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothes Store</title>
     <link rel="stylesheet" href="/static/css/style.css">
-
     {{block "css" .}}{{end}}
 </head>
 <body>
-    <nav>
-        </nav>
-
-    <main>
+    <nav class="navbar">
+        <div class="logo">StoreBrand</div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/cart">Cart</a></li>
+            <li><a href="/login">Login</a></li>
+        </ul>
+    </nav>
+    <main class="container">
         {{template "main" .}}
     </main>
-
-    <script src="/static/js/main.js"></script>
-
+    <footer>
+        &copy; 2026 Clothes Store
+    </footer>
     {{block "js" .}}{{end}}
 </body>
 </html>
