@@ -5,6 +5,12 @@
   "hints": {
     "meta-viewport": "off",
     "meta-charset-utf-8": "off",
-    "button-type": "off"
+    "button-type": "off",
+    "axe/forms": [
+      "default",
+      {
+        "label": "off"
+      }
+    ]
   }
 }

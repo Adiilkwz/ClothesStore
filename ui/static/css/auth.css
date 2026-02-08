@@ -1,0 +1,9 @@
+.auth-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+.form-group { margin-bottom: 15px; }
+.form-group input { width: 100%; padding: 10px; }
