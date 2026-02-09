@@ -14,6 +14,11 @@ type AuthHandler struct {
 	UserModel *models.UserModel
 }
 
+type LoginResponse struct {
+	Token string `json:"token"`
+	Role  string `json:"role"`
+}
+
 func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name     string `json:"name"`
@@ -65,9 +70,9 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := map[string]any{
-		"message": "Login succesful",
-		"token":   token,
+	response := LoginResponse{
+		Token: token,
+		Role:  role,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
