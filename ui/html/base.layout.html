@@ -1,5 +1,4 @@
-{{define "base"}}
-<!DOCTYPE html>
+{{define "base"}}  <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,15 +13,26 @@
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="/cart">Cart</a></li>
-            <li><a href="/login">Login</a></li>
+
+            <li id="admin-link" style="display: none;">
+                <a href="/admin" style="color: #e74c3c; font-weight: bold;">Admin Panel</a>
+            </li>
+
+            <li id="login-link"><a href="/profile">Login</a></li>
+            <li id="profile-link" style="display: none;"><a href="/profile">My Profile</a></li>
+            <li id="logout-link" style="display: none;"><a href="#" onclick="logout()">Logout</a></li>
         </ul>
     </nav>
+
     <main class="container">
         {{template "main" .}}
     </main>
+
     <footer>
         &copy; 2026 Clothes Store
     </footer>
+
+    <script src="/static/js/main.js"></script>
     {{block "js" .}}{{end}}
 </body>
 </html>

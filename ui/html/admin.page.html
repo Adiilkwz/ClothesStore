@@ -1,22 +1,50 @@
 {{template "base" .}}
-{{define "main"}}
-  <h1>Admin Dashboard</h1>
-  
-  <form class="admin-form">
-      <input type="text" placeholder="Product Name">
-      <input type="number" placeholder="Price">
-      <button class="btn">Add Product</button>
-  </form>
 
-  <table class="admin-table">
-      <thead>
-          <tr><th>ID</th><th>Name</th><th>Price</th><th>Action</th></tr>
-      </thead>
-      <tbody>
-          <tr>
-              <td>1</td><td>Test Shirt</td><td>5000 KZT</td>
-              <td><button>Delete</button></td>
-          </tr>
-      </tbody>
-  </table>
+{{define "css"}}
+<style>
+    .admin-form {
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        display: grid;
+        gap: 10px;
+    }
+    .admin-form input { padding: 10px; border: 1px solid #ddd; }
+    
+    .admin-table { width: 100%; background: white; border-collapse: collapse; }
+    .admin-table th, .admin-table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    .admin-table th { background: #333; color: white; }
+</style>
 {{end}}
+
+{{define "main"}}
+    <h1>Admin Dashboard</h1>
+
+    <form id="add-product-form" class="admin-form">
+        <h3>Add New Product</h3>
+        <input type="text" id="p-name" placeholder="Name" required>
+        <input type="number" id="p-price" placeholder="Price" required>
+        <input type="text" id="p-image" placeholder="Image URL" required>
+        <input type="text" id="p-category" placeholder="Category" required>
+        <input type="text" id="p-size" placeholder="Size (S/M/L)" required>
+        <input type="number" id="p-stock" placeholder="Stock Quantity" required>
+        <button type="submit" class="btn">Add Product</button>
+    </form>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="admin-products-list">
+            </tbody>
+    </table>
+{{end}}
+
+{{define "js"}}<script src="/static/js/admin.js"></script>{{end}}

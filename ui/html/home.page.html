@@ -1,0 +1,21 @@
+{{template "base" .}}
+
+{{define "css"}}
+    <link rel="stylesheet" href="/static/css/home.css">
+{{end}}
+
+{{define "main"}}
+    <section class="hero">
+        <h1>Welcome to Clothes Store</h1>
+        <p>Find the best styles for you.</p>
+    </section>
+
+    <div class="container">
+        <h2>Latest Arrivals</h2>
+        <div id="product-grid" class="product-grid">
+            <p>Loading products...</p>
+        </div>
+    </div>
+{{end}}
+
+{{define "js"}}<script src="/static/js/home.js"></script>{{end}}

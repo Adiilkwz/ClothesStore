@@ -1,0 +1,56 @@
+{{template "base" .}}
+
+{{define "css"}}
+    <link rel="stylesheet" href="/static/css/profile.css">
+{{end}}
+
+{{define "main"}}
+    <div id="auth-section" class="auth-wrapper" style="display: none;">
+        
+        <div class="auth-box">
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+
+        <div class="divider">OR</div>
+
+        <div class="auth-box">
+            <h2>New Customer?</h2>
+            <p>Create an account to track orders and checkout faster.</p>
+            <form id="signup-form">
+                <input type="text" id="s-name" placeholder="Full Name" required>
+                <input type="email" id="s-email" placeholder="Email" required>
+                <input type="password" id="s-password" placeholder="Password" required>
+                <input type="text" id="s-address" placeholder="Shipping Address" required>
+                <button type="submit" class="btn btn-outline">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="profile-section" class="profile-wrapper" style="display: none;">
+        <div class="profile-header">
+            <h1 id="user-name">Welcome User</h1>
+        </div>
+        
+        <div class="profile-details">
+            <div class="detail-card">
+                <h3>My Info</h3>
+                <p><strong>Email:</strong> <span id="user-email">...</span></p>
+                <p><strong>Address:</strong> <span id="user-address">...</span></p>
+            </div>
+            
+            <div class="detail-card">
+                <h3>Order History</h3>
+                <ul id="order-list">
+                    <li>Loading orders...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+{{define "js"}}<script src="/static/js/profile.js"></script>{{end}}
