@@ -21,6 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function logout() {
     localStorage.removeItem("token");
-    localStorage.removeItem("role"); // 👈 Clear role on logout
+    localStorage.removeItem("role");
     window.location.href = "/";
 }

@@ -6,7 +6,11 @@
     --white: #ffffff;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
 
 body {
     font-family: sans-serif;
@@ -40,7 +44,10 @@ body {
     gap: 20px;
 }
 
-.nav-links a { color: white; text-decoration: none; }
+.nav-links a { 
+    color: white; 
+    text-decoration: none; 
+}
 
 .btn {
     background: var(--accent);

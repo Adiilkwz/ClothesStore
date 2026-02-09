@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        // ✅ Relative Path: Works on port 5050
         const res = await fetch('/products');
         
         if (!res.ok) throw new Error("Failed to fetch");
@@ -8,16 +7,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const products = await res.json();
         const grid = document.getElementById("product-grid");
 
-        // Handle empty database
         if (!products || products.length === 0) {
             grid.innerHTML = "<p>No products found. Admin needs to add some!</p>";
             return;
         }
 
-        grid.innerHTML = ""; // Clear loading text
+        grid.innerHTML = "";
 
         products.forEach(p => {
-            // Safety check for image URL
             const img = p.image_url || "https://via.placeholder.com/200?text=No+Image";
 
             grid.innerHTML += `
