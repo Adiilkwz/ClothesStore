@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -13,7 +14,7 @@ import (
 )
 
 type OrderRequest struct {
-	ProductIDs []models.OrderItemInput `json:"items"`
+	Items []models.OrderItemInput `json:"items"`
 }
 
 type OrderHandler struct {
@@ -23,7 +24,6 @@ type OrderHandler struct {
 
 func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	userIDVal := r.Context().Value("userID")
-
 	userID, ok := userIDVal.(int)
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -31,21 +31,27 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req OrderRequest
-
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	orderID, err := h.OrderModel.Create(userID, req.ProductIDs)
+	orderID, err := h.OrderModel.Create(userID, req.Items)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		log.Println("Order creation failed:", err)
+		http.Error(w, "Failed to create order", 500)
 		return
 	}
 
 	user, err := h.UserModel.GetByID(userID)
 	if err == nil {
-		mailer.EmailQueue <- user.Email
+		job := mailer.EmailJob{
+			To:      user.Email,
+			Subject: fmt.Sprintf("Order Confirmation #%d", orderID),
+			Body:    fmt.Sprintf("Hello! Your order #%d has been successfully placed. We will notify you when it ships.", orderID),
+		}
+
+		mailer.EmailQueue <- job
 	} else {
 		log.Printf("Could not fetch email for user %d", userID)
 	}
@@ -54,7 +60,7 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"order_id": orderID,
-		"status":   "Created and Email sent to Queue",
+		"status":   "Created",
 	})
 }
 

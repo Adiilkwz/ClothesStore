@@ -14,13 +14,13 @@ type Order struct {
 }
 
 type OrderItemInput struct {
-	ProductID int
-	Quantity  int
+	ProductID int `json:"product_id"`
+	Quantity  int `json:"quantity"`
 }
 
 type OrderItem struct {
 	ProductName string `json:"product_name"`
-	Price       int    `json:"price_kzt"`
+	Price       int    `json:"price"`
 	Quantity    int    `json:"quantity"`
 }
 
@@ -35,6 +35,14 @@ func (m *OrderModel) Create(userID int, items []OrderItemInput) (int, error) {
 	}
 
 	var totalPrice int
+
+	type itemWithPrice struct {
+		ProductID int
+		Quantity  int
+		Price     int
+	}
+	var itemsToSave []itemWithPrice
+
 	for _, item := range items {
 		var price int
 		err := tx.QueryRow("SELECT price_kzt FROM products WHERE id = $1", item.ProductID).Scan(&price)
@@ -42,12 +50,18 @@ func (m *OrderModel) Create(userID int, items []OrderItemInput) (int, error) {
 			tx.Rollback()
 			return 0, err
 		}
+
 		totalPrice += price * item.Quantity
+		itemsToSave = append(itemsToSave, itemWithPrice{
+			ProductID: item.ProductID,
+			Quantity:  item.Quantity,
+			Price:     price,
+		})
 	}
 
 	var orderID int
 	stmtOrder := `INSERT INTO orders (user_id, total_price, status, created_at) 
-                VALUES ($1, $2, 'Pending', NOW()) RETURNING id`
+                  VALUES ($1, $2, 'Pending', NOW()) RETURNING id`
 
 	err = tx.QueryRow(stmtOrder, userID, totalPrice).Scan(&orderID)
 	if err != nil {
@@ -55,10 +69,10 @@ func (m *OrderModel) Create(userID int, items []OrderItemInput) (int, error) {
 		return 0, err
 	}
 
-	stmtItems := `INSERT INTO order_items (order_id, product_id, quantity) VALUES ($1, $2, $3)`
+	stmtItems := `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)`
 
-	for _, item := range items {
-		_, err := tx.Exec(stmtItems, orderID, item.ProductID, item.Quantity)
+	for _, item := range itemsToSave {
+		_, err := tx.Exec(stmtItems, orderID, item.ProductID, item.Quantity, item.Price)
 		if err != nil {
 			tx.Rollback()
 			return 0, err
@@ -91,7 +105,7 @@ func (m *OrderModel) GetAllByUserID(userID int) ([]Order, error) {
 
 func (m *OrderModel) GetItems(orderID int) ([]OrderItem, error) {
 	stmt := `
-    SELECT p.name, p.price_kzt, oi.quantity
+    SELECT p.name, oi.price, oi.quantity
     FROM order_items oi
     JOIN products p ON oi.product_id = p.id
     WHERE oi.order_id = $1`

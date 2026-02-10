@@ -3,10 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const tbody = document.getElementById("cart-table-body");
     const emptyMsg = document.getElementById("empty-msg");
+    const summaryBox = document.querySelector(".cart-summary");
 
     if (cart.length === 0) {
         emptyMsg.style.display = "block";
         document.querySelector(".cart-table").style.display = "none";
+        
+        if (summaryBox) summaryBox.style.display = "none";
+        
         return;
     }
 
@@ -61,11 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (res.ok) {
-                alert("Order Placed Successfully!");
+                const data = await res.json(); 
+                
+                alert(`Order Placed Successfully! (Order ID: ${data.order_id})\nCheck your email for confirmation.`);
+                
                 localStorage.removeItem("cart_items");
                 window.location.href = "/profile";
             } else {
-                alert("Order failed.");
+                alert("Order failed. Please try again.");
             }
         } catch (err) {
             console.error(err);
