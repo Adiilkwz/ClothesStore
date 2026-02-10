@@ -1,20 +1,29 @@
 {{template "base" .}}
 
 {{define "css"}}
+<link rel="stylesheet" href="/static/css/admin.css">
 <style>
-    .admin-form {
-        background: white;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        display: grid;
+    .size-group {
+        display: flex;
         gap: 10px;
+        align-items: center;
+        background: #f9f9f9;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        grid-column: span 2;
     }
-    .admin-form input { padding: 10px; border: 1px solid #ddd; }
-    
-    .admin-table { width: 100%; background: white; border-collapse: collapse; }
-    .admin-table th, .admin-table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
-    .admin-table th { background: #333; color: white; }
+    .size-group label {
+        margin-left: 5px;
+        cursor: pointer;
+        font-weight: normal;
+    }
+    .error-msg {
+        color: red;
+        font-size: 0.9rem;
+        display: none;
+        grid-column: span 2;
+    }
 </style>
 {{end}}
 
@@ -23,28 +32,42 @@
 
     <form id="add-product-form" class="admin-form">
         <h3>Add New Product</h3>
-        <input type="text" id="p-name" placeholder="Name" required>
-        <input type="number" id="p-price" placeholder="Price" required>
-        <input type="text" id="p-image" placeholder="Image URL" required>
-        <input type="text" id="p-category" placeholder="Category" required>
-        <input type="text" id="p-size" placeholder="Size (S/M/L)" required>
-        <input type="number" id="p-stock" placeholder="Stock Quantity" required>
+        <p id="form-error" class="error-msg"></p>
+
+        <div class="form-grid">
+            <input type="text" id="p-name" placeholder="Name" required>
+            <input type="number" id="p-price" placeholder="Price" required>
+            <input type="text" id="p-image" placeholder="Image URL" required>
+            <input type="text" id="p-category" placeholder="Category" required>
+            
+            <div class="size-group">
+                <span>Sizes:</span>
+                <label><input type="checkbox" name="size" value="S"> S</label>
+                <label><input type="checkbox" name="size" value="M"> M</label>
+                <label><input type="checkbox" name="size" value="L"> L</label>
+                <label><input type="checkbox" name="size" value="XL"> XL</label>
+            </div>
+
+            <input type="number" id="p-stock" placeholder="Total Stock" min="1" required>
+        </div>
+
         <button type="submit" class="btn">Add Product</button>
     </form>
 
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="admin-products-list">
-            </tbody>
-    </table>
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>   <th>Sizes</th>   <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="admin-products-list">
+                </tbody>
+        </table>
+    </div>
 {{end}}
 
 {{define "js"}}<script src="/static/js/admin.js"></script>{{end}}

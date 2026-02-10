@@ -71,28 +71,27 @@ func (sh *StoreHandler) GetOne(w http.ResponseWriter, r *http.Request) {
 
 func (sh *StoreHandler) Update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-
-	var input struct {
-		Price int `json:"price_kzt"`
-		Stock int `json:"stock_quantity"`
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
+		return
 	}
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+
+	var p models.Product
+	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	if input.Price <= 0 {
-		http.Error(w, "Price must be positive", http.StatusBadRequest)
+	if err := sh.ProductModel.Update(id, &p); err != nil {
+		log.Println("Error updating product:", err)
+		http.Error(w, "Failed to update product", http.StatusInternalServerError)
 		return
 	}
 
-	err := sh.ProductModel.Update(id, input.Price, input.Stock)
-	if err != nil {
-		http.Error(w, "Server Error", http.StatusInternalServerError)
-		return
-	}
-	w.Write([]byte("Product updated"))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Product updated"})
 }
 
 func (sh *StoreHandler) Delete(w http.ResponseWriter, r *http.Request) {

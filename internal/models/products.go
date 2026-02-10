@@ -74,9 +74,20 @@ func (m *ProductModel) Get(id int) (*Product, error) {
 	return p, err
 }
 
-func (m *ProductModel) Update(id int, price, stock int) error {
-	stmt := `UPDATE products SET price_kzt = $1, stock_quantity = $2 WHERE id = $3`
-	_, err := m.DB.Exec(stmt, price, stock, id)
+func (m *ProductModel) Update(id int, p *Product) error {
+	stmt := `UPDATE products 
+             SET name = $1, price_kzt = $2, size = $3, category = $4, image_url = $5, stock_quantity = $6
+             WHERE id = $7`
+
+	_, err := m.DB.Exec(stmt,
+		p.Name,
+		p.Price,
+		p.Size,
+		p.Category,
+		p.ImageURL,
+		p.StockQuantity,
+		id,
+	)
 	return err
 }
 
