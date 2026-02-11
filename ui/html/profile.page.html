@@ -34,6 +34,7 @@
     <div id="profile-section" class="profile-wrapper" style="display: none;">
         <div class="profile-header">
             <h1 id="user-name">Welcome User</h1>
+            <button onclick="logout()" class="btn-logout">Logout</button>
         </div>
         
         <div class="profile-details">
@@ -51,6 +52,30 @@
             </div>
         </div>
     </div>
+
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Order Details</h2>
+            
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="modal-items">
+                    </tbody>
+            </table>
+
+            <div class="modal-actions">
+                <button id="cancel-order-btn" class="btn-danger" style="display: none;">Cancel Order</button>
+            </div>
+        </div>
+    </div>
 {{end}}
 
-{{define "js"}}<script src="/static/js/profile.js"></script>{{end}}
+{{define "js"}}<script src="/static/js/profile.js?v=2"></script>{{end}}
