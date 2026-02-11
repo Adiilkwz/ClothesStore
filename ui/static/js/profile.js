@@ -172,8 +172,8 @@ async function viewOrder(orderId, status) {
                     <tr>
                         <td>${item.product_name}</td>
                         <td>${item.quantity}</td>
-                        <td>${item.price_kzt} KZT</td>
-                        <td>${item.price_kzt * item.quantity} KZT</td>
+                        <td>${item.price} KZT</td>
+                        <td>${item.price * item.quantity} KZT</td>
                     </tr>
                 `;
             });
