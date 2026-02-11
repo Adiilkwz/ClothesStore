@@ -73,17 +73,68 @@ async function loadUserProfile(token) {
         });
         if (res.ok) {
             const user = await res.json();
-            const nameElem = document.getElementById("user-name");
-            const emailElem = document.getElementById("user-email");
-            const addrElem = document.getElementById("user-address");
             
-            if (nameElem) nameElem.innerText = `Hello, ${user.name}`;
-            if (emailElem) emailElem.innerText = user.email;
-            if (addrElem) addrElem.innerText = user.address;
+            document.getElementById("user-name").innerText = `Hello, ${user.name}`;
+
+            document.getElementById("display-name").innerText = user.name;
+            document.getElementById("user-email").innerText = user.email;
+            document.getElementById("display-address").innerText = user.address;
+
+            document.getElementById("edit-name").value = user.name;
+            document.getElementById("edit-address").value = user.address;
         } else {
             logout();
         }
     } catch (err) { console.error(err); }
+}
+
+function toggleEdit() {
+    const viewMode = document.getElementById("view-mode");
+    const editMode = document.getElementById("edit-mode");
+    const editBtn = document.getElementById("edit-btn");
+
+    if (editMode.style.display === "none") {
+        viewMode.style.display = "none";
+        editMode.style.display = "block";
+        editBtn.style.display = "none";
+    } else {
+        editMode.style.display = "none";
+        viewMode.style.display = "block";
+        editBtn.style.display = "block";
+    }
+}
+
+async function saveProfile(event) {
+    event.preventDefault();
+    
+    const token = localStorage.getItem("token");
+    const newName = document.getElementById("edit-name").value;
+    const newAddress = document.getElementById("edit-address").value;
+
+    try {
+        const res = await fetch("/api/users/me", {
+            method: "PUT",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token 
+            },
+            body: JSON.stringify({
+                name: newName,
+                address: newAddress
+            })
+        });
+
+        if (res.ok) {
+            alert("Profile Updated Successfully!");
+            loadUserProfile(token);
+            toggleEdit();
+        } else {
+            alert("Failed to update profile.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error connecting to server.");
+    }
 }
 
 async function loadOrders(token) {

@@ -256,3 +256,60 @@
         grid-template-columns: 1fr;
     }
 }
+
+.btn-small {
+    background: transparent;
+    color: #3498db;
+    border: 1px solid #3498db;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.btn-small:hover {
+    background: #3498db;
+    color: white;
+}
+
+/* Edit Form Styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Fixes width padding issues */
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-save {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}

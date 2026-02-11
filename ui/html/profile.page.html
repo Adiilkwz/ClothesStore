@@ -39,9 +39,33 @@
         
         <div class="profile-details">
             <div class="detail-card">
-                <h3>My Info</h3>
-                <p><strong>Email:</strong> <span id="user-email">...</span></p>
-                <p><strong>Address:</strong> <span id="user-address">...</span></p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>My Info</h3>
+                    <button id="edit-btn" class="btn-small" onclick="toggleEdit()">Edit</button>
+                </div>
+                
+                <div id="view-mode">
+                    <p><strong>Name:</strong> <span id="display-name">Loading...</span></p>
+                    <p><strong>Email:</strong> <span id="user-email">Loading...</span></p>
+                    <p><strong>Address:</strong> <span id="display-address">Loading...</span></p>
+                </div>
+
+                <form id="edit-mode" style="display: none;" onsubmit="saveProfile(event)">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="edit-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="edit-address" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save">Save</button>
+                        <button type="button" onclick="toggleEdit()" class="btn-cancel">Cancel</button>
+                    </div>
+                </form>
             </div>
             
             <div class="detail-card">
