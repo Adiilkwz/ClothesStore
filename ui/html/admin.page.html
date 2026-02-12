@@ -30,35 +30,37 @@
 {{define "main"}}
     <h1>Admin Dashboard</h1>
 
-    <form id="add-product-form" class="admin-form">
+    <div class="admin-panel">
         <h3>Add New Product</h3>
-        <p id="form-error" class="error-msg"></p>
+        <form id="add-product-form">
+            <div class="form-grid">
+                <input type="text" id="p-name" placeholder="Product Name" required class="form-input">
+                <input type="number" id="p-price" placeholder="Price (KZT)" required class="form-input">
+                
+                <input type="text" id="p-image" placeholder="Image URL" class="form-input">
+                
+                <select id="p-category" required class="form-input">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="Shirts">Shirts</option>
+                    <option value="Pants">Pants</option>
+                    <option value="Suits">Suits</option>
+                    <option value="Outerwear">Outerwear</option>
+                </select>
 
-        <div class="form-grid">
-            <input type="text" id="p-name" placeholder="Name" required>
-            <input type="number" id="p-price" placeholder="Price" required>
-            <input type="text" id="p-image" placeholder="Image URL" required>
-            <select id="p-category" required class="form-select">
-                <option value="" disabled selected>Select Category</option>
-                <option value="Shirts">Shirts</option>
-                <option value="Pants">Pants</option>
-                <option value="Suits">Suits</option>
-                <option value="Outerwear">Outerwear</option>
-            </select>
-            
-            <div class="size-group">
-                <span>Sizes:</span>
-                <label><input type="checkbox" name="size" value="S"> S</label>
-                <label><input type="checkbox" name="size" value="M"> M</label>
-                <label><input type="checkbox" name="size" value="L"> L</label>
-                <label><input type="checkbox" name="size" value="XL"> XL</label>
+                <div class="size-box">
+                    <span>Sizes:</span>
+                    <label><input type="checkbox" value="S"> S</label>
+                    <label><input type="checkbox" value="M"> M</label>
+                    <label><input type="checkbox" value="L"> L</label>
+                    <label><input type="checkbox" value="XL"> XL</label>
+                </div>
+
+                <input type="number" id="p-stock" placeholder="Total Stock" required class="form-input">
             </div>
 
-            <input type="number" id="p-stock" placeholder="Total Stock" min="1" required>
-        </div>
-
-        <button type="submit" class="btn">Add Product</button>
-    </form>
+            <button type="submit" class="btn-submit">Add Product</button>
+        </form>
+    </div>
 
     <div class="table-container">
         <table class="admin-table">

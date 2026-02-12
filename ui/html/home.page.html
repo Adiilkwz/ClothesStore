@@ -2,50 +2,21 @@
 
 {{define "css"}}
     <link rel="stylesheet" href="/static/css/home.css">
-    <style>
-        .filter-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-        .filter-btn {
-            padding: 10px 20px;
-            border: 2px solid #2c3e50;
-            background: white;
-            color: #2c3e50;
-            cursor: pointer;
-            border-radius: 25px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        .filter-btn:hover, .filter-btn.active {
-            background: #2c3e50;
-            color: white;
-        }
-        .section-title {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 2rem;
-            color: #333;
-        }
-    </style>
 {{end}}
 
 {{define "main"}}
     <section class="hero">
-        <h1>Welcome to Clothes Store</h1>
+        <h1>Welcome to Gentlemen's World</h1>
         <p>Classic Style for the Modern Era.</p>
     </section>
 
     <div class="container">
         <h2 class="section-title">Latest Arrivals</h2>
         <div id="latest-grid" class="product-grid">
-            <p>Loading latest items...</p>
+            <p style="text-align:center; width:100%;">Loading latest items...</p>
         </div>
 
-        <hr style="margin: 50px 0; border: 0; border-top: 1px solid #eee;">
+        <hr class="divider">
 
         <h2 class="section-title">Shop by Category</h2>
         
@@ -57,9 +28,9 @@
             <button class="filter-btn" onclick="setCategory('Outerwear', this)">Outerwear</button>
         </div>
 
-        <div class="advanced-filters" style="text-align: center; margin-bottom: 20px;">
+        <div class="advanced-filters">
             <select id="filter-size" onchange="applyFilters()">
-                <option value="">Any Size</option>
+                <option value="">Size: Any</option>
                 <option value="S">S</option>
                 <option value="M">M</option>
                 <option value="L">L</option>
@@ -69,11 +40,11 @@
             <input type="number" id="filter-min-price" placeholder="Min Price" onchange="applyFilters()">
             <input type="number" id="filter-max-price" placeholder="Max Price" onchange="applyFilters()">
             
-            <button onclick="clearFilters()" style="padding: 5px 10px; cursor: pointer;">Clear</button>
+            <button class="btn-clear" onclick="clearFilters()">Clear</button>
         </div>
 
         <div id="filter-grid" class="product-grid">
-            <p>Select a category...</p>
+            <p style="text-align:center; width:100%;">Select a category...</p>
         </div>
     </div>
 {{end}}
