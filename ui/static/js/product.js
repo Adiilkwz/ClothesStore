@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!id) return;
 
     try {
-        const res = await fetch(`/products/${id}`);
+        const res = await fetch(`/products/${id}`); // Ensure this matches your API route
         if (!res.ok) throw new Error("Product not found");
         const p = await res.json();
         
@@ -22,6 +22,17 @@ document.addEventListener("DOMContentLoaded", async () => {
              sizeOptions = '<option value="OneSize">One Size</option>';
         }
 
+        // Logic for Out of Stock
+        let stockDisplay = `<span>Stock: ${p.stock_quantity}</span>`;
+        let buttonState = "";
+        let buttonText = "Add to Cart";
+        
+        if (p.stock_quantity <= 0) {
+            stockDisplay = `<span style="color: red; font-weight: bold;">Out of Stock</span>`;
+            buttonState = "disabled style='background-color: #ccc; cursor: not-allowed;'";
+            buttonText = "Sold Out";
+        }
+
         container.innerHTML = `
             <div class="product-image">
                 <img src="${imgUrl}" alt="${p.name}">
@@ -32,11 +43,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 <div class="meta">
                     <span>Category: ${p.category}</span> | 
-                    <span>Stock: ${p.stock_quantity}</span>
+                    ${stockDisplay}
                 </div>
 
                 <p class="description">
-                   High-quality ${p.name}. Perfect for your collection.
+                    High-quality ${p.name}. Perfect for your collection.
                 </p>
 
                 <div class="selection-area">
@@ -49,11 +60,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     <div class="selection-row">
                         <label for="qty-input">Quantity:</label>
-                        <input type="number" id="qty-input" value="1" min="1" max="${p.stock_quantity}">
+                        <input type="number" id="qty-input" value="1" min="1" max="${p.stock_quantity}" oninput="checkMax(this, ${p.stock_quantity})">
                     </div>
                 </div>
 
-                <button class="btn-large" onclick="addToCart(${p.id}, '${p.name}', ${p.price_kzt})">Add to Cart</button>
+                <button class="btn-large" id="add-btn" ${buttonState} onclick="addToCart(${p.id}, '${p.name}', ${p.price_kzt}, ${p.stock_quantity})">${buttonText}</button>
             </div>
         `;
     } catch (err) {
@@ -62,13 +73,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-function addToCart(id, name, price) {
+// Helper to stop typing numbers larger than max
+function checkMax(input, max) {
+    if (parseInt(input.value) > max) {
+        input.value = max;
+        alert(`Sorry, we only have ${max} items in stock.`);
+    }
+    if (parseInt(input.value) < 1) {
+        input.value = 1;
+    }
+}
+
+// Updated Function with Stock Validation
+function addToCart(id, name, price, maxStock) {
     const sizeSelect = document.getElementById("size-select");
     const qtyInput = document.getElementById("qty-input");
 
     const selectedSize = sizeSelect.value;
     const quantity = parseInt(qtyInput.value);
 
+    // 1. Basic Validation
     if (!selectedSize) {
         alert("Please select a size first!");
         return;
@@ -77,26 +101,48 @@ function addToCart(id, name, price) {
         alert("Quantity must be at least 1");
         return;
     }
-
-    const cartItem = {
-        productId: id,
-        name: name,
-        price: price,
-        size: selectedSize,
-        quantity: quantity
-    };
+    if (quantity > maxStock) {
+        alert(`Sorry, you cannot order more than ${maxStock} items.`);
+        return;
+    }
 
     let cart = JSON.parse(localStorage.getItem("cart_items") || "[]");
 
-    const existingIndex = cart.findIndex(item => item.productId === id && item.size === selectedSize);
+    // 2. Check if item already exists in cart
+    const existingIndex = cart.findIndex(item => item.productId === id);
 
     if (existingIndex > -1) {
-        cart[existingIndex].quantity += quantity;
+        // Calculate potential total
+        const currentCartQty = cart[existingIndex].quantity;
+        const newTotal = currentCartQty + quantity;
+
+        // 3. STOCK CHECK: (Cart + New) vs Stock
+        if (newTotal > maxStock) {
+            alert(`Stock Limit Reached!\nYou already have ${currentCartQty} in your cart.\nYou can only add ${maxStock - currentCartQty} more.`);
+            return;
+        }
+
+        cart[existingIndex].quantity = newTotal;
+        cart[existingIndex].size = selectedSize; // Update size if needed
     } else {
-        cart.push(cartItem);
+        cart.push({
+            productId: id,
+            name: name,
+            price: price,
+            size: selectedSize,
+            quantity: quantity
+        });
     }
     
     localStorage.setItem("cart_items", JSON.stringify(cart));
     
-    alert(`Added ${quantity} x ${name} (${selectedSize}) to cart!`);
+    // Optional: Visual Feedback
+    const btn = document.getElementById("add-btn");
+    const originalText = btn.innerText;
+    btn.innerText = "Added!";
+    btn.style.backgroundColor = "#27ae60";
+    setTimeout(() => {
+        btn.innerText = originalText;
+        btn.style.backgroundColor = ""; // Reset
+    }, 1000);
 }

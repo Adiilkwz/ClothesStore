@@ -21,12 +21,19 @@ type ProductModel struct {
 	DB *sql.DB
 }
 
-// Insert adds a new product
 func (m *ProductModel) Insert(p Product) (int, error) {
+	if p.Price < 0 {
+		return 0, fmt.Errorf("price cannot be negative")
+	}
+	if p.StockQuantity < 0 {
+		return 0, fmt.Errorf("stock quantity cannot be negative")
+	}
+
 	stmt := `INSERT INTO products (name, description, price_kzt, size, category, image_url, stock_quantity)
-  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
 
 	var id int
+
 	err := m.DB.QueryRow(stmt,
 		p.Name,
 		p.Description,
@@ -36,7 +43,11 @@ func (m *ProductModel) Insert(p Product) (int, error) {
 		p.ImageURL,
 		p.StockQuantity,
 	).Scan(&id)
-	return id, err
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (m *ProductModel) GetAll(category, size string, minPrice, maxPrice, limit int) ([]Product, error) {

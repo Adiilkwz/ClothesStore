@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -33,53 +34,58 @@ func (m *OrderModel) Create(userID int, items []OrderItemInput) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer tx.Rollback()
 
 	var totalPrice int
-
-	type itemWithPrice struct {
-		ProductID int
-		Quantity  int
-		Price     int
-	}
-	var itemsToSave []itemWithPrice
-
 	for _, item := range items {
 		var price int
-		err := tx.QueryRow("SELECT price_kzt FROM products WHERE id = $1", item.ProductID).Scan(&price)
+		var currentStock int
+
+		err := tx.QueryRow("SELECT price_kzt, stock_quantity FROM products WHERE id = $1", item.ProductID).Scan(&price, &currentStock)
 		if err != nil {
-			tx.Rollback()
 			return 0, err
+		}
+
+		if currentStock < item.Quantity {
+			return 0, fmt.Errorf("not enough stock for product ID %d (In Stock: %d)", item.ProductID, currentStock)
 		}
 
 		totalPrice += price * item.Quantity
-		itemsToSave = append(itemsToSave, itemWithPrice{
-			ProductID: item.ProductID,
-			Quantity:  item.Quantity,
-			Price:     price,
-		})
 	}
 
-	var orderID int
 	stmtOrder := `INSERT INTO orders (user_id, total_price, status, created_at) 
-                  VALUES ($1, $2, 'Pending', NOW()) RETURNING id`
+                  VALUES ($1, $2, 'Paid', NOW()) RETURNING id`
 
+	var orderID int
 	err = tx.QueryRow(stmtOrder, userID, totalPrice).Scan(&orderID)
 	if err != nil {
-		tx.Rollback()
 		return 0, err
 	}
 
-	stmtItems := `INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)`
+	stmtItem := `INSERT INTO order_items (order_id, product_id, quantity, price)
+                 VALUES ($1, $2, $3, (SELECT price_kzt FROM products WHERE id = $2))`
 
-	for _, item := range itemsToSave {
-		_, err := tx.Exec(stmtItems, orderID, item.ProductID, item.Quantity, item.Price)
+	stmtUpdateStock := `UPDATE products 
+                        SET stock_quantity = stock_quantity - $1 
+                        WHERE id = $2`
+
+	for _, item := range items {
+		_, err := tx.Exec(stmtItem, orderID, item.ProductID, item.Quantity)
 		if err != nil {
-			tx.Rollback()
+			return 0, err
+		}
+
+		_, err = tx.Exec(stmtUpdateStock, item.Quantity, item.ProductID)
+		if err != nil {
 			return 0, err
 		}
 	}
 
-	return orderID, tx.Commit()
+	if err = tx.Commit(); err != nil {
+		return 0, err
+	}
+
+	return orderID, nil
 }
 
 func (m *OrderModel) GetAllByUserID(userID int) ([]Order, error) {

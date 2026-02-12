@@ -4,8 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchProducts();
 
     const form = document.getElementById("add-product-form");
-    const submitBtn = form.querySelector("button[type='submit']");
-    const formTitle = form.querySelector("h3");
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -22,6 +20,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const sizeCheckboxes = document.querySelectorAll('input[name="size"]:checked');
         let selectedSizes = [];
         sizeCheckboxes.forEach((cb) => selectedSizes.push(cb.value));
+
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!nameRegex.test(name)) {
+            return showError("Product Name must contain only letters and spaces.");
+        }
+
+        try {
+            new URL(image);
+        } catch (_) {
+            return showError("Please enter a valid Image URL (starting with http:// or https://)");
+        }
 
         if (!name || !image || !category) return showError("Please fill in all text fields.");
         if (selectedSizes.length === 0) return showError("Please select at least one size.");
@@ -83,18 +92,10 @@ async function startEdit(id) {
         document.getElementById("p-category").value = p.category;
         document.getElementById("p-stock").value = p.stock_quantity;
 
-        const sizes = p.size.split(",").map(s => s.trim());
-        document.querySelectorAll('input[name="size"]').forEach(cb => cb.checked = false);
-
-        if (p.size) {
-            const sizes = p.size.split(",").map(s => s.trim());
-            
-            document.querySelectorAll('input[name="size"]').forEach(cb => {
-                if (sizes.includes(cb.value)) {
-                    cb.checked = true;
-                }
-            });
-        }
+        const sizes = p.size ? p.size.split(",").map(s => s.trim()) : [];
+        document.querySelectorAll('input[name="size"]').forEach(cb => {
+            cb.checked = sizes.includes(cb.value);
+        });
 
         editingID = p.id;
         document.querySelector("#add-product-form h3").innerText = "Edit Product (ID: " + p.id + ")";

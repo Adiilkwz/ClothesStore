@@ -3,26 +3,15 @@
 {{define "css"}}
 <link rel="stylesheet" href="/static/css/admin.css">
 <style>
-    .size-group {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        background: #f9f9f9;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        grid-column: span 2;
-    }
-    .size-group label {
-        margin-left: 5px;
-        cursor: pointer;
-        font-weight: normal;
-    }
     .error-msg {
-        color: red;
-        font-size: 0.9rem;
+        color: white;
+        background-color: #e74c3c;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        text-align: center;
         display: none;
-        grid-column: span 2;
+        font-weight: bold;
     }
 </style>
 {{end}}
@@ -32,6 +21,9 @@
 
     <div class="admin-panel">
         <h3>Add New Product</h3>
+        
+        <div id="form-error" class="error-msg"></div>
+
         <form id="add-product-form">
             <div class="form-grid">
                 <input type="text" id="p-name" placeholder="Product Name" required class="form-input">
@@ -49,10 +41,10 @@
 
                 <div class="size-box">
                     <span>Sizes:</span>
-                    <label><input type="checkbox" value="S"> S</label>
-                    <label><input type="checkbox" value="M"> M</label>
-                    <label><input type="checkbox" value="L"> L</label>
-                    <label><input type="checkbox" value="XL"> XL</label>
+                    <label><input type="checkbox" name="size" value="S"> S</label>
+                    <label><input type="checkbox" name="size" value="M"> M</label>
+                    <label><input type="checkbox" name="size" value="L"> L</label>
+                    <label><input type="checkbox" name="size" value="XL"> XL</label>
                 </div>
 
                 <input type="number" id="p-stock" placeholder="Total Stock" required class="form-input">
