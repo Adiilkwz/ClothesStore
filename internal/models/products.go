@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 )
 
 type Product struct {
@@ -37,10 +39,49 @@ func (m *ProductModel) Insert(p Product) (int, error) {
 	return id, err
 }
 
-// GetAll fetches all products
-func (m *ProductModel) GetAll() ([]Product, error) {
-	stmt := `SELECT id, name, description, price_kzt, size, category, image_url, stock_quantity FROM products`
-	rows, err := m.DB.Query(stmt)
+func (m *ProductModel) GetAll(category, size string, minPrice, maxPrice, limit int) ([]Product, error) {
+	baseQuery := `SELECT id, name, description, price_kzt, size, category, image_url, stock_quantity FROM products`
+
+	var args []interface{}
+	var whereClauses []string
+	argCounter := 1
+
+	if category != "" && category != "All" {
+		whereClauses = append(whereClauses, fmt.Sprintf("category = $%d", argCounter))
+		args = append(args, category)
+		argCounter++
+	}
+
+	if size != "" {
+		whereClauses = append(whereClauses, fmt.Sprintf("size LIKE $%d", argCounter))
+		args = append(args, "%"+size+"%")
+		argCounter++
+	}
+
+	if minPrice > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("price_kzt >= $%d", argCounter))
+		args = append(args, minPrice)
+		argCounter++
+	}
+
+	if maxPrice > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("price_kzt <= $%d", argCounter))
+		args = append(args, maxPrice)
+		argCounter++
+	}
+
+	if len(whereClauses) > 0 {
+		baseQuery += " WHERE " + strings.Join(whereClauses, " AND ")
+	}
+
+	baseQuery += " ORDER BY id DESC"
+
+	if limit > 0 {
+		baseQuery += fmt.Sprintf(" LIMIT $%d", argCounter)
+		args = append(args, limit)
+	}
+
+	rows, err := m.DB.Query(baseQuery, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,16 +90,7 @@ func (m *ProductModel) GetAll() ([]Product, error) {
 	var products []Product
 	for rows.Next() {
 		var p Product
-		err = rows.Scan(
-			&p.ID,
-			&p.Name,
-			&p.Description,
-			&p.Price,
-			&p.Size,
-			&p.Category,
-			&p.ImageURL,
-			&p.StockQuantity,
-		)
+		err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.Size, &p.Category, &p.ImageURL, &p.StockQuantity)
 		if err != nil {
 			return nil, err
 		}

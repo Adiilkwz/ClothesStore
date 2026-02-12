@@ -16,9 +16,26 @@ type StoreHandler struct {
 	Logger       *log.Logger
 }
 
-// GetAll returns all products as JSON
 func (sh *StoreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	products, err := sh.ProductModel.GetAll()
+	category := r.URL.Query().Get("category")
+	size := r.URL.Query().Get("size")
+	limitStr := r.URL.Query().Get("limit")
+	minPriceStr := r.URL.Query().Get("min_price")
+	maxPriceStr := r.URL.Query().Get("max_price")
+
+	parseInt := func(s string) int {
+		val, err := strconv.Atoi(s)
+		if err != nil {
+			return 0
+		}
+		return val
+	}
+
+	limit := parseInt(limitStr)
+	minPrice := parseInt(minPriceStr)
+	maxPrice := parseInt(maxPriceStr)
+
+	products, err := sh.ProductModel.GetAll(category, size, minPrice, maxPrice, limit)
 	if err != nil {
 		sh.Logger.Printf("Error fetching products: %v", err)
 		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
@@ -29,11 +46,9 @@ func (sh *StoreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products)
 }
 
-// Create inserts a new product and returns 201 Created
 func (sh *StoreHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var product models.Product
 
-	// Parse JSON input
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
 		sh.Logger.Printf("Error decoding product: %v", err)
@@ -41,7 +56,6 @@ func (sh *StoreHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insert product into database
 	id, err := sh.ProductModel.Insert(product)
 	if err != nil {
 		sh.Logger.Printf("Error inserting product: %v", err)
@@ -49,7 +63,6 @@ func (sh *StoreHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set the ID on the product and respond with 201 Created
 	product.ID = id
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

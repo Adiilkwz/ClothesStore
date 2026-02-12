@@ -120,3 +120,16 @@ h1 {
 .btn-edit:hover {
     background: #2980b9;
 }
+
+select#p-category {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    background-color: white;
+    color: #333;
+}
