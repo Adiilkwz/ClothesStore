@@ -108,7 +108,6 @@
     max-width: 200px;
 }
 
-/* Add to product.css */
 .btn-large:disabled {
     background-color: #bdc3c7;
     cursor: not-allowed;

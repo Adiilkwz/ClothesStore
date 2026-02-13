@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!id) return;
 
     try {
-        const res = await fetch(`/products/${id}`); // Ensure this matches your API route
+        const res = await fetch(`/products/${id}`);
         if (!res.ok) throw new Error("Product not found");
         const p = await res.json();
         
@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async () => {
              sizeOptions = '<option value="OneSize">One Size</option>';
         }
 
-        // Logic for Out of Stock
         let stockDisplay = `<span>Stock: ${p.stock_quantity}</span>`;
         let buttonState = "";
         let buttonText = "Add to Cart";
@@ -73,7 +72,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// Helper to stop typing numbers larger than max
 function checkMax(input, max) {
     if (parseInt(input.value) > max) {
         input.value = max;
@@ -84,7 +82,6 @@ function checkMax(input, max) {
     }
 }
 
-// Updated Function with Stock Validation
 function addToCart(id, name, price, maxStock) {
     const sizeSelect = document.getElementById("size-select");
     const qtyInput = document.getElementById("qty-input");
@@ -92,7 +89,6 @@ function addToCart(id, name, price, maxStock) {
     const selectedSize = sizeSelect.value;
     const quantity = parseInt(qtyInput.value);
 
-    // 1. Basic Validation
     if (!selectedSize) {
         alert("Please select a size first!");
         return;
@@ -108,22 +104,19 @@ function addToCart(id, name, price, maxStock) {
 
     let cart = JSON.parse(localStorage.getItem("cart_items") || "[]");
 
-    // 2. Check if item already exists in cart
     const existingIndex = cart.findIndex(item => item.productId === id);
 
     if (existingIndex > -1) {
-        // Calculate potential total
         const currentCartQty = cart[existingIndex].quantity;
         const newTotal = currentCartQty + quantity;
 
-        // 3. STOCK CHECK: (Cart + New) vs Stock
         if (newTotal > maxStock) {
             alert(`Stock Limit Reached!\nYou already have ${currentCartQty} in your cart.\nYou can only add ${maxStock - currentCartQty} more.`);
             return;
         }
 
         cart[existingIndex].quantity = newTotal;
-        cart[existingIndex].size = selectedSize; // Update size if needed
+        cart[existingIndex].size = selectedSize;
     } else {
         cart.push({
             productId: id,
@@ -136,13 +129,12 @@ function addToCart(id, name, price, maxStock) {
     
     localStorage.setItem("cart_items", JSON.stringify(cart));
     
-    // Optional: Visual Feedback
     const btn = document.getElementById("add-btn");
     const originalText = btn.innerText;
     btn.innerText = "Added!";
     btn.style.backgroundColor = "#27ae60";
     setTimeout(() => {
         btn.innerText = originalText;
-        btn.style.backgroundColor = ""; // Reset
+        btn.style.backgroundColor = "";
     }, 1000);
 }
