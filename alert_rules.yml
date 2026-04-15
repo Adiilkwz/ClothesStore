@@ -1,0 +1,20 @@
+groups:
+  - name: production_alerts
+    rules:
+      - alert: BackendServiceDown
+        expr: up{job="backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL: Backend Down on {{ $labels.instance }}"
+          description: "The backend service has been unreachable for more than 1 minute. Immediate action required."
+
+      - alert: HighCpuUsageWarning
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "WARNING: High CPU on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for 2 minutes. Performance may be degraded."

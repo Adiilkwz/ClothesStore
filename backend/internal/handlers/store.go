@@ -109,7 +109,19 @@ func (sh *StoreHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (sh *StoreHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-	sh.ProductModel.Delete(id)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	err = sh.ProductModel.Delete(id)
+	if err != nil {
+		sh.Logger.Printf("Error deleting product %d: %v", id, err)
+		http.Error(w, "Cannot delete this product. It is likely part of an existing User Order.", http.StatusConflict)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Product deleted"))
 }

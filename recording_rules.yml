@@ -1,0 +1,5 @@
+groups:
+  - name: example_recording_rules
+    rules:
+      - record: job:up:count
+        expr: count(up) by (job)

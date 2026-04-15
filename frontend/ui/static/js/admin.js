@@ -98,7 +98,9 @@ async function startEdit(id) {
         });
 
         editingID = p.id;
-        document.querySelector("#add-product-form h3").innerText = "Edit Product (ID: " + p.id + ")";
+        
+        document.querySelector(".admin-panel h3").innerText = "Edit Product (ID: " + p.id + ")";
+        
         const btn = document.querySelector("#add-product-form button");
         btn.innerText = "Update Product";
         btn.style.background = "#e67e22";
@@ -115,7 +117,9 @@ function resetForm() {
     editingID = null;
     document.getElementById("add-product-form").reset();
     document.querySelectorAll('input[name="size"]').forEach(cb => cb.checked = false);
-    document.querySelector("#add-product-form h3").innerText = "Add New Product";
+    
+    document.querySelector(".admin-panel h3").innerText = "Add New Product";
+    
     const btn = document.querySelector("#add-product-form button");
     btn.innerText = "Add Product";
     btn.style.background = "";
@@ -152,17 +156,34 @@ async function fetchProducts() {
 }
 
 async function deleteProduct(id) {
-    if(!confirm("Are you sure?")) return;
+    if(!confirm("Are you sure you want to delete this product?")) return;
+    
     const token = localStorage.getItem("token");
-    await fetch(`/api/admin/products/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": "Bearer " + token }
-    });
-    fetchProducts();
+    
+    try {
+        const res = await fetch(`/api/admin/products/${id}`, {
+            method: "DELETE",
+            headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (res.ok) {
+            fetchProducts(); 
+        } else {
+            const msg = await res.text();
+            alert("Error: " + msg);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Network Error: Could not contact server.");
+    }
 }
 
 function showError(msg) {
     const el = document.getElementById("form-error");
-    el.innerText = msg;
-    el.style.display = "block";
+    if (el) {
+        el.innerText = msg;
+        el.style.display = "block";
+    } else {
+        alert(msg);
+    }
 }
